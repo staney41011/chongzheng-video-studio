@@ -162,21 +162,22 @@ el('aiResults').style.display='none';show('已送出雲端 MP4 渲染，關閉�
 }
 }catch(e){show('無法送出：'+e.message,true)}finally{btn.disabled=false}
 });
-el('briefForm').addEventListener('submit',async(event)=>{
-event.preventDefault();if(!secret()){show('請先輸入工作台密碼。',true);return}
-const payload={
-project:el('project').value.trim(),folder_url:el('drive').value.trim(),format:format,
+el('briefForm').addEventListener('submit',async e=>{
+e.preventDefault();if(!token()){show('請先輸入工作台密碼。',true);return}
+const payload={project:el('project').value.trim(),folder_url:el('drive').value.trim(),format,
 duration_seconds:Number(el('duration').value),captions:el('captions').value,
-music:el('music').value,quality:el('ratio').value,prompt:el('prompt').value.trim()
-};
-const button=el('saveButton');button.disabled=true;button.textContent='正在儲存…';
+music:el('music').value,quality:el('ratio').value,prompt:el('prompt').value.trim()};
+const btn=el('saveButton');btn.disabled=true;btn.textContent='正在建立雲端任務…';
 try{
-const response=await fetch(API_BASE+'/api/briefs',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Key':secret()},body:JSON.stringify(payload)});
-const value=await responseJSON(response);
-show('已儲存任務 '+value.id+'。\n狀態：等待 Google Drive / AI 剪輯後端串接。\n目前尚未開始剪片，也不會產生運算費用。',false);
+const job=await responseJSON(await API('/api/briefs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}));
+workingId=job.id;show('任務已儲存，嘗試讓 AI 讀取素材。',false);
+try{
+await responseJSON(await API('/api/briefs/'+workingId+'/analyze',{method:'POST'}));
+show('已開始由 Modal 在雲端分析照片與影片；關閉頁面不會中斷已送出的工作。',false);monitor(workingId);
+}catch(err){show('已儲存任務，但尚未啟動 AI：'+err.message+'\n請先按上方「檢查 AI / Drive 連線」。',true)}
 loadHistory();
-}catch(err){show('儲存失敗：'+err.message,true)}
-finally{button.disabled=false;button.textContent='儲存這份剪輯任務　→'}
+}catch(err){show('建立任務失敗：'+err.message,true)}
+finally{btn.disabled=false;btn.textContent='儲存並讓 AI 分析素材　→'}
 });
 el('copyButton').addEventListener('click',async()=>{
 const prompt=el('prompt').value;try{await navigator.clipboard.writeText(prompt);show('已複製 Prompt。',false)}catch(err){show('複製失敗，請手動選取文字。',true)}
@@ -184,15 +185,17 @@ const prompt=el('prompt').value;try{await navigator.clipboard.writeText(prompt);
 async function loadHistory(){
 const list=el('historyList');list.textContent='正在載入…';
 try{
-const response=await fetch(API_BASE+'/api/briefs',{headers:{'X-Editor-Key':secret()}});
+const response=await API('/api/briefs');
 const data=await responseJSON(response);list.replaceChildren();
 if(!data.items.length){const p=document.createElement('p');p.className='muted';p.textContent='目前尚無儲存的任務。';list.append(p);return}
 for(const job of data.items){
 const item=document.createElement('div');item.className='historyitem';
 const title=document.createElement('strong');title.textContent=job.project;
 const sub=document.createElement('small');sub.textContent=(formatLabels[job.format]||job.format)+' · '+job.duration_seconds+' 秒 · '+(job.created_at||'');
-const status=document.createElement('em');status.textContent='等待後端串接';
-item.append(title,sub,status);list.append(item);
+const status=document.createElement('em');status.textContent=statusNames[job.status]||job.status;
+const open=document.createElement('button');open.className='textbtn';open.style.cssText='display:block;margin-top:8px;padding:7px 11px';open.type='button';open.textContent='開啟任務';
+open.addEventListener('click',async()=>{try{const j=await showJob(job.id);if(['queued','analyzing','rendering'].includes(j.status))monitor(job.id);el('status').scrollIntoView({behavior:'smooth',block:'center'})}catch(err){show('無法開啟任務：'+err.message,true)}});
+item.append(title,sub,status,open);list.append(item);
 }
 }catch(err){list.textContent='無法載入：'+err.message}
 }
