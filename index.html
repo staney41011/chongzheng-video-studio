@@ -37,7 +37,7 @@ footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-si
 <section class="panel">
 <div class="paneltitle"><span class="num">01</span><h2>建立剪輯任務</h2></div>
 <form id="briefForm">
-<label for="password">工作台密碼</label><input type="password" id="password" required autocomplete="off" placeholder="輸入你設定的 EDITOR_KEY"><p class="hint">密碼只用於當次連線，不會儲存在瀏覽器永久儲存空間。</p><div class="actions" style="margin-top:10px"><button type="button" class="textbtn" id="connectionButton">檢查 AI / Drive 連線</button><button type="button" class="textbtn" id="connectGoogleButton">連接 Google Drive</button></div><div class="status" id="connectionStatus" style="display:block;background:#f7f8f6;color:#516558;border-color:#e6eae4">請先輸入工作台密碼，再檢查雲端連線狀態。</div>
+<label for="password">工作台密碼</label><div style="display:flex;gap:8px;align-items:center"><input type="password" id="password" required autocomplete="off" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="6 位數字密碼" aria-label="6 位數字工作台密碼" style="flex:1;min-width:0"><button type="button" id="togglePin" class="textbtn" aria-pressed="false" aria-label="顯示密碼" style="padding:12px 14px;min-width:76px">顯示</button></div><p class="hint">密碼只用於當次連線，不會儲存在瀏覽器永久儲存空間。</p><div class="actions" style="margin-top:10px"><button type="button" class="textbtn" id="connectionButton">檢查 AI / Drive 連線</button><button type="button" class="textbtn" id="connectGoogleButton">連接 Google Drive</button></div><div class="status" id="connectionStatus" style="display:block;background:#f7f8f6;color:#516558;border-color:#e6eae4">請先輸入工作台密碼，再檢查雲端連線狀態。</div>
 <label for="project">活動名稱</label><input type="text" id="project" maxlength="100" required value="" placeholder="例如：青年進階班｜活動回顧">
 <label for="drive">Google Drive 素材資料夾</label><input type="text" id="drive" maxlength="500" required spellcheck="false" value="" placeholder="https://drive.google.com/drive/folders/..."><p class="hint">使用 Google Drive 資料夾網址；不必先將素材下載到電腦。</p>
 <label>成品格式</label><div class="preset" id="presets">
@@ -73,6 +73,14 @@ footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-si
 <script>
 (function(){
 const el=id=>document.getElementById(id);
+el('togglePin').addEventListener('click',()=>{
+  const field=el('password'), button=el('togglePin');
+  const showing=field.type==='password';
+  field.type=showing?'text':'password';
+  button.textContent=showing?'隱藏':'顯示';
+  button.setAttribute('aria-pressed',String(showing));
+  button.setAttribute('aria-label',showing?'隱藏密碼':'顯示密碼');
+});
 const API_BASE='https://staney41011--chongzheng-cloud-video-editor-web.us-east.modal.run';
 let format='reels';
 const formatLabels={reels:'REELS · 9:16',shorts:'SHORTS · 9:16',youtube:'YOUTUBE · 16:9'};
