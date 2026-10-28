@@ -32,12 +32,12 @@ footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-si
 <body>
 <header><a href="./" class="brand"><span class="mark">崇</span><span><strong>崇正 AI 影片工作台</strong><small>CHONGZHENG · CREATIVE STUDIO</small></span></a><div class="headright"><span class="tag">雲端試行版</span><a href="https://staney41011--chongzheng-cloud-video-editor-web.us-east.modal.run/test">基本剪輯測試 ↗</a></div></header>
 <main>
-<section class="hero"><div class="eyebrow">FROM PROMPT TO VIDEO</div><h1>把珍貴的活動時刻，<br>剪成值得回味的故事。</h1><p>貼上 Google Drive 素材資料夾，選擇影片格式，再用中文告訴 AI 你的想法。現在可先保存完整剪輯任務；Google Drive 自動讀取與 AI 製片串接中。</p></section>
+<section class="hero"><div class="eyebrow">FROM PROMPT TO VIDEO</div><h1>把珍貴的活動時刻，<br>剪成值得回味的故事。</h1><p>連接 Google Drive，讓 AI 先查看素材中的照片和影片畫面，提出剪輯 Prompt 和分鏡。確認後，由 Modal 雲端剪輯並把成品存回 Google Drive。</p></section>
 <div class="columns">
 <section class="panel">
 <div class="paneltitle"><span class="num">01</span><h2>建立剪輯任務</h2></div>
 <form id="briefForm">
-<label for="password">工作台密碼</label><input type="password" id="password" required autocomplete="off" placeholder="輸入你設定的 EDITOR_KEY"><p class="hint">只在這個頁面使用，不儲存在瀏覽器或剪輯任務內。</p>
+<label for="password">工作台密碼</label><input type="password" id="password" required autocomplete="off" placeholder="輸入你設定的 EDITOR_KEY"><p class="hint">密碼只用於當次連線，不會儲存在瀏覽器永久儲存空間。</p><div class="actions" style="margin-top:10px"><button type="button" class="textbtn" id="connectionButton">檢查 AI / Drive 連線</button><button type="button" class="textbtn" id="connectGoogleButton">連接 Google Drive</button></div><div class="status" id="connectionStatus" style="display:block;background:#f7f8f6;color:#516558;border-color:#e6eae4">請先輸入工作台密碼，再檢查雲端連線狀態。</div>
 <label for="project">活動名稱</label><input type="text" id="project" maxlength="100" required value="" placeholder="例如：青年進階班｜活動回顧">
 <label for="drive">Google Drive 素材資料夾</label><input type="text" id="drive" maxlength="500" required spellcheck="false" value="" placeholder="https://drive.google.com/drive/folders/..."><p class="hint">使用 Google Drive 資料夾網址；不必先將素材下載到電腦。</p>
 <label>成品格式</label><div class="preset" id="presets">
@@ -53,9 +53,9 @@ footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-si
 <div><label for="music">背景音樂</label><select id="music"><option value="warm" selected>溫暖、感動的器樂</option><option value="bright">活潑、明亮的器樂</option><option value="ceremonial">莊重、有力量的器樂</option><option value="none">不要背景音樂</option></select></div>
 <div><label for="ratio">畫面輸出</label><select id="ratio"><option value="1080" selected>1080p 高清</option><option value="720">720p 快速預覽</option></select></div>
 </div>
-<div class="dual"><div><label for="videoType">影片用途</label><select id="videoType"><option value="event">活動回顧／花絮</option><option value="course">課程精華／講座</option><option value="promo">招生／宣傳短片</option><option value="memory">感恩／紀念影片</option></select></div><div><label for="tone">影片風格</label><select id="tone"><option value="warm">溫暖、感動、自然</option><option value="energetic">青春、活潑、有節奏</option><option value="elegant">莊重、典雅、有質感</option><option value="cinematic">電影感、情緒堆疊</option></select></div></div><label for="highlights">活動重點（可留空）</label><input type="text" id="highlights" maxlength="300" placeholder="例如：甜點製作、互動遊戲、團體合照"><p class="hint">如果沒有填重點，指令會要求先分析素材內容，不會虛構活動環節。</p><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:22px"><label for="prompt" style="margin:0">你的剪輯 Prompt</label><button type="button" class="textbtn" id="generateButton" style="background:#edf6f0;border-color:#b4d8c4;padding:10px 14px">✦ 一鍵自動產生 Prompt</button></div><p class="hint" style="margin-bottom:9px">根據活動、影片類型、字幕、音樂與輸出格式自動編寫，可再手動修改。</p><textarea id="prompt" required maxlength="5000" placeholder="點擊「一鍵自動產生 Prompt」，或直接輸入你的剪輯需求"></textarea>
-<div class="actions"><button class="primary" id="saveButton" type="submit">儲存這份剪輯任務　→</button><button class="textbtn" type="button" id="copyButton">複製 Prompt</button></div>
-<div id="status" class="status" role="status"></div>
+<div class="dual"><div><label for="videoType">影片用途</label><select id="videoType"><option value="event">活動回顧／花絮</option><option value="course">課程精華／講座</option><option value="promo">招生／宣傳短片</option><option value="memory">感恩／紀念影片</option></select></div><div><label for="tone">影片風格</label><select id="tone"><option value="warm">溫暖、感動、自然</option><option value="energetic">青春、活潑、有節奏</option><option value="elegant">莊重、典雅、有質感</option><option value="cinematic">電影感、情緒堆疊</option></select></div></div><label for="highlights">活動重點（可留空）</label><input type="text" id="highlights" maxlength="300" placeholder="例如：甜點製作、互動遊戲、團體合照"><p class="hint">如果沒有填重點，指令會要求先分析素材內容，不會虛構活動環節。</p><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:22px"><label for="prompt" style="margin:0">你的剪輯 Prompt</label><button type="button" class="textbtn" id="generateButton" style="background:#edf6f0;border-color:#b4d8c4;padding:10px 14px">✦ AI 看過素材後產生 Prompt</button></div><p class="hint" style="margin-bottom:9px">產生的 Prompt 必須依據 AI 實際檢視的照片及影片畫面，不會只是填空範本。</p><textarea id="prompt" maxlength="5000" placeholder="這裡可先輸入你希望影片呈現的方向；AI 檢視素材後將提出實際剪輯 Prompt。"></textarea>
+<div class="actions"><button class="primary" id="saveButton" type="submit">儲存並讓 AI 分析素材　→</button><button class="textbtn" type="button" id="copyButton">複製 Prompt</button></div>
+<div id="status" class="status" role="status"></div><div id="aiResults" style="display:none;margin-top:18px;border:1px solid #cfe0d4;border-radius:14px;padding:17px;background:#f8fbf9"><h3 style="margin:0 0 10px">AI 素材分析與分鏡</h3><div id="aiSummary" style="font-size:14px;white-space:pre-wrap;line-height:1.8"></div><div id="aiTimeline" style="font-size:13px;white-space:pre-wrap;line-height:1.7;margin-top:13px"></div><div id="aiWarnings" style="font-size:12px;color:#936b42;line-height:1.7;margin-top:10px"></div><div id="contactSheets" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px"></div><button type="button" class="primary" id="renderButton" style="width:100%;margin-top:15px">確認 Prompt 並開始雲端剪輯</button></div>
 </form>
 </section>
 <aside class="right">
@@ -64,8 +64,8 @@ footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-si
 <div class="stage"><div class="phone" id="phone"><div class="previewtop">CHONGZHENG · VIDEO STUDIO</div><div class="previewcenter"><h3 id="previewTitle">活動回顧</h3><span>精彩活動回顧</span></div><div class="previewbottom">留下每個溫暖的瞬間</div></div></div>
 <div class="previewmeta"><span id="previewFormat">REELS · 9:16</span><span id="previewDuration">60 秒</span></div>
 </section>
-<section class="note"><strong>目前的功能狀態</strong>這個網頁可以安全保存剪輯需求與瀏覽任務紀錄。尚未接通 Google Drive 的雲端授權、AI 自動選段與成品回存，因此新任務會標記為「等待後端串接」，不會假裝影片已在製作。<br><br>如果要先測試 Modal 是否能實際輸出 MP4，可使用 <a href="https://staney41011--chongzheng-cloud-video-editor-web.us-east.modal.run/test">基本剪輯測試</a>。</section>
-<section class="panel history"><div class="paneltitle"><span class="num">02</span><h2>我的剪輯任務</h2></div><button class="textbtn" style="width:100%" type="button" id="loadButton">載入已儲存的任務</button><div class="historyList" id="historyList" style="margin-top:14px"><p class="muted" style="font-size:13px">輸入密碼後，點擊載入。</p></div></section>
+<section class="note"><strong>目前的功能狀態</strong>流程改為「AI 觀看素材 → 給出 Prompt 和剪輯時間軸 → 你確認 → Modal 輸出」。第一次需要完成 Google OAuth 與 Gemini API 設定；未完成時會顯示實際缺少項目，而不是假裝正在剪輯。<br><br>如果要先測試 Modal 是否能實際輸出 MP4，可使用 <a href="https://staney41011--chongzheng-cloud-video-editor-web.us-east.modal.run/test">基本剪輯測試</a>。</section>
+<section class="panel history"><div class="paneltitle"><span class="num">02</span><h2>我的剪輯任務</h2></div><button class="textbtn" style="width:100%" type="button" id="loadButton">查看已儲存的任務</button><div class="historyList" id="historyList" style="margin-top:14px"><p class="muted" style="font-size:13px">輸入密碼後，點擊載入。</p></div></section>
 </aside>
 </div>
 </main><footer>崇正 AI 影片工作台 · 專案測試版 · 保護活動影像與參與者隱私</footer>
@@ -93,43 +93,75 @@ function show(message,isError){const box=el('status');box.style.display='block';
 async function responseJSON(response){let value={};try{value=await response.json()}catch(e){}if(!response.ok)throw new Error(value.detail||'伺服器回應失敗');return value;}
 const secret=()=>el('password').value.trim();
 
-const promptStyle={warm:'溫馨、感動、真實且不煽情',energetic:'年輕、明亮、活潑、有節奏',elegant:'典雅、莊重、乾淨克制',cinematic:'電影敘事、漸進堆疊情緒'};
-const promptMusic={warm:'溫柔、有層次的原創器樂',bright:'明亮輕快的原創器樂',ceremonial:'莊重且有力量的原創器樂',none:'不加入背景音樂'};
-const promptCaptions={narrative:'清楚易讀的繁體中文活動敘事字幕，僅敘述可由素材確認的畫面',spoken:'使用實際錄音製作逐字字幕，不可虛構發言',both:'真實對白逐字字幕加上適量敘事文字，避免疊字',none:'不加入字幕'};
-const promptType={event:'活動回顧',course:'課程精華',promo:'招生宣傳',memory:'感恩紀念'};
-const promptFocus={
-event:'呈現活動開始、參與互動、過程亮點和真誠的結尾，交錯使用照片與影片。',
-course:'保留講師原意與完整論述脈絡，挑選能獨立理解的精華，不改變原話。',
-promo:'前三秒建立吸引力，凸顯真實的參與價值，不得添加未證實的招生活動資訊。',
-memory:'捕捉真實互動與珍貴時刻，營造溫暖的回憶，不虛構致謝內容。'
-};
-function createPrompt(){
-const type=el('videoType').value;
-const name=el('project').value.trim()||'本次活動';
-const duration=el('duration').value;
-const target=format==='youtube'?'YouTube 16:9 橫式':format==='shorts'?'YouTube Shorts 9:16 直式':'Instagram Reels 9:16 直式';
-const quality=el('ratio').value==='1080'?'1080p':'720p';
-const highlights=el('highlights').value.trim();
-const parts=[
-'請將「'+name+'」製作成一支'+promptType[type]+'影片。',
-'素材來源：'+(el('drive').value.trim()||'本任務提供的 Google Drive 資料夾')+'。',
-'輸出規格：'+target+'，'+quality+'，片長約 '+duration+' 秒；素材不足時不重複灌水。',
-'影片風格：'+promptStyle[el('tone').value]+'。'+promptFocus[type],
-highlights?'優先呈現以下重點：'+highlights+'。若素材中沒有這些內容，請勿捏造。':'先辨識照片與影片的實際場景，再挑選有代表性、清晰、有情緒張力的畫面；不可憑空假設活動發生什麼事。',
-'剪輯節奏：保留人物臉部及重要主體，直式構圖不可裁掉關鍵人物，過度模糊、晃動、重複和無關片段應適度去除；轉場自然、不過量。',
-'字幕：'+promptCaptions[el('captions').value]+'；字幕要大且避開手機介面遮擋區。',
-'音樂：'+promptMusic[el('music').value]+'；只使用有合法授權的音樂，重要人聲出現時自動降低背景音量。',
-'輸出 H.264 MP4 / AAC；保留素材清單、時間碼與剪輯設定，輸出前檢查黑畫面、字幕、音畫同步及是否有錯誤內容。',
-'所有內容必須尊重參與者與講師，不得改寫講師原話、添加虛構對白或未核實的人名。'
-];
-return parts.join('\n\n');
-}
-el('generateButton').addEventListener('click',()=>{
-el('prompt').value=createPrompt();
-show('已依你選擇的條件產生剪輯 Prompt，仍可手動調整。這是免費規則式自動生成，尚未實際讀取 Google Drive 影像分析。',false);
-el('prompt').focus();
-});
 
+const token=()=>el('password').value.trim();
+const API=(path,opts={})=>fetch(API_BASE+path,{...opts,headers:{...opts.headers,'X-Editor-Key':token()}});
+const statusNames={draft:'已儲存，尚未分析',awaiting_integration:'舊版等待連線',queued:'已排入雲端分析',analyzing:'AI 正在檢視素材',review:'AI 分析完成，待確認',rendering:'正在製作 MP4',completed:'已完成並存回 Google Drive',failed:'處理失敗'};
+let workingId=null,previousPrompt='',poll=null;
+const connection=(msg,error=false)=>{const c=el('connectionStatus');c.className='status'+(error?' error':'');c.style.display='block';c.textContent=msg};
+async function checkConnection(){
+if(!token()){connection('請先輸入工作台密碼。',true);return}
+try{
+const d=await responseJSON(await API('/api/capabilities'));
+connection('Google Drive：'+(d.drive_connected?'已連接':'尚未授權')+'；Gemini：'+(d.gemini_configured?'已設定':'尚未設定')+(d.missing.length?'。\n還缺少：'+d.missing.join('、'):'')+(d.ready?'。\n可以開始 AI 素材分析。':'。\n請先完成授權與金鑰設定。'),!d.ready);
+}catch(e){connection('無法檢查：'+e.message,true)}
+}
+el('connectionButton').addEventListener('click',checkConnection);
+el('connectGoogleButton').addEventListener('click',async()=>{
+if(!token()){connection('請先輸入工作台密碼。',true);return}
+try{const d=await responseJSON(await API('/api/google/start'));if(!d.url.startsWith('https://accounts.google.com/'))throw Error('授權網址異常');location.href=d.url}
+catch(e){connection('Google 授權無法開始：'+e.message,true)}
+});
+if(new URLSearchParams(location.search).get('drive')==='connected')connection('Google 授權已完成，請重新輸入工作台密碼並檢查連線。');
+el('generateButton').addEventListener('click',()=>{
+show('要產生真正的 AI Prompt，請按下方「儲存並讓 AI 分析素材」。\nAI 先檢視 Google Drive 素材，才會生成具體建議。',false);
+el('saveButton').scrollIntoView({behavior:'smooth',block:'center'});
+});
+async function showJob(id){
+const j=await responseJSON(await API('/api/briefs/'+id));workingId=id;
+show('狀態：'+(statusNames[j.status]||j.status)+(j.error?'\n原因：'+j.error:''),j.status==='failed');
+if(j.status==='review'&&j.analysis){
+clearInterval(poll);el('aiResults').style.display='block';
+el('aiSummary').textContent=j.analysis.summary||'AI 素材分析已完成。';
+el('aiTimeline').textContent='已檢視 '+j.analysis.photo_count+' 張照片、'+j.analysis.video_count+' 段影片。建議 '+j.analysis.timeline.length+' 個鏡頭，總片長約 '+j.analysis.estimated_seconds+' 秒。\n\n'+j.analysis.timeline.slice(0,30).map((c,i)=>(i+1)+'. '+c.file+'，'+c.start+' 秒起，使用 '+c.duration+' 秒；'+c.caption).join('\n');
+el('aiWarnings').textContent=(j.analysis.warnings||[]).join('；');
+el('prompt').value=j.prompt||j.analysis.prompt||'';previousPrompt=el('prompt').value;
+loadContactSheets(id);
+}
+if(j.status==='completed'&&j.output){
+clearInterval(poll);show('影片已完成：'+j.output.name+'\n已存回 Google Drive。',false);
+const link=document.createElement('a');link.href=j.output.url;link.target='_blank';link.rel='noopener';link.textContent='開啟影片成品';el('status').append(document.createElement('br'),link);
+}
+if(j.status==='failed')clearInterval(poll);
+return j;
+}
+async function loadContactSheets(id){
+const parent=el('contactSheets');parent.replaceChildren();
+for(let i=0;i<8;i++){
+try{const r=await API('/api/briefs/'+id+'/contact/'+i);if(!r.ok)break;
+const blob=await r.blob(),src=URL.createObjectURL(blob);
+const image=document.createElement('img');image.src=src;image.alt='實際素材抽樣影格 第 '+(i+1)+' 頁';image.style.cssText='width:100%;border-radius:7px';parent.append(image);
+}catch(e){break}
+}
+}
+function monitor(id){clearInterval(poll);poll=setInterval(async()=>{
+try{const j=await showJob(id);if(['completed','review','failed'].includes(j.status))clearInterval(poll)}
+catch(e){clearInterval(poll);show(e.message,true)}
+},6000)}
+el('renderButton').addEventListener('click',async()=>{
+if(!workingId){show('尚未建立有效任務。',true);return}
+const btn=el('renderButton');btn.disabled=true;
+try{
+if(el('prompt').value.trim()!==previousPrompt.trim()){
+await responseJSON(await API('/api/briefs/'+workingId+'/prompt',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:el('prompt').value})}));
+await responseJSON(await API('/api/briefs/'+workingId+'/analyze',{method:'POST'}));
+el('aiResults').style.display='none';show('你修改了 Prompt，AI 正重新分析素材並調整時間軸，完成後再確認渲染。',false);monitor(workingId);
+}else{
+await responseJSON(await API('/api/briefs/'+workingId+'/render',{method:'POST'}));
+el('aiResults').style.display='none';show('已送出雲端 MP4 渲染，關閉手機也不會中斷後端任務。',false);monitor(workingId);
+}
+}catch(e){show('無法送出：'+e.message,true)}finally{btn.disabled=false}
+});
 el('briefForm').addEventListener('submit',async(event)=>{
 event.preventDefault();if(!secret()){show('請先輸入工作台密碼。',true);return}
 const payload={
