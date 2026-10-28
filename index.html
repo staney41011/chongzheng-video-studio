@@ -167,7 +167,7 @@ el('briefForm').addEventListener('submit',async e=>{
 e.preventDefault();if(!token()){show('請先輸入工作台密碼。',true);return}
 const payload={project:el('project').value.trim(),folder_url:el('drive').value.trim(),format,
 duration_seconds:Number(el('duration').value),captions:el('captions').value,
-music:el('music').value,quality:el('ratio').value,prompt:el('prompt').value.trim()};
+music:el('music').value,quality:el('ratio').value,prompt:el('prompt').value.trim(),video_type:el('videoType').value,tone:el('tone').value,highlights:el('highlights').value.trim()};
 const btn=el('saveButton');btn.disabled=true;btn.textContent='正在建立雲端任務…';
 try{
 const job=await responseJSON(await API('/api/briefs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}));
