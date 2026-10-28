@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10271e">
+<title>崇正 · AI 影片工作台</title>
+<style>
+:root{--ink:#17241e;--sub:#64746c;--green:#185a43;--gold:#be9862;--line:#e4e9e4;--bg:#f6f8f5;--white:#fff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #9ccdb8;outline-offset:2px}
+header{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1170px)/2))}
+.brand{display:flex;align-items:center;gap:13px;text-decoration:none;color:var(--ink)}.mark{background:var(--green);color:white;font-weight:800;font-size:23px;width:45px;height:45px;display:grid;place-items:center;border-radius:13px}.brand strong{font-size:18px;letter-spacing:.04em}.brand small{display:block;font-size:11px;color:var(--sub);letter-spacing:.06em;margin-top:3px}
+.headright{display:flex;gap:10px;align-items:center}.tag{font-size:12px;border:1px solid #c8d9cf;color:var(--green);background:#f0f8f3;padding:7px 10px;border-radius:99px;font-weight:700}.headright a{color:var(--green);font-size:13px;text-decoration:none}
+main{max-width:1170px;margin:auto;padding:48px 24px 90px}.eyebrow{color:var(--green);font-size:13px;font-weight:800;letter-spacing:.16em;margin:0 0 16px}.hero{margin-bottom:30px}.hero h1{font-size:clamp(30px,4vw,47px);line-height:1.26;letter-spacing:-.035em;margin:0 0 12px}.hero p{font-size:16px;color:var(--sub);line-height:1.85;margin:0;max-width:810px}
+.columns{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(310px,.9fr);gap:26px;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);box-shadow:0 14px 45px #1b3a2710;border-radius:21px;padding:30px}.paneltitle{display:flex;gap:11px;align-items:center;margin-bottom:24px}.num{background:#e8f1e9;color:var(--green);border-radius:10px;width:30px;height:30px;display:grid;place-items:center;font-size:14px;font-weight:800}.paneltitle h2{font-size:19px;margin:0;letter-spacing:.01em}
+label{display:block;font-weight:700;font-size:14px;margin:22px 0 9px}.hint{font-size:12px;color:var(--sub);margin:6px 0 0;line-height:1.6}input[type=text],input[type=password],select,textarea{display:block;width:100%;border:1px solid #d7dfd8;border-radius:11px;padding:13px 14px;color:var(--ink);background:#fff;min-height:49px;font-size:15px}textarea{min-height:145px;line-height:1.75;resize:vertical}input::placeholder,textarea::placeholder{color:#98a49b}
+.preset{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.preset button{border:1px solid #dce5dd;background:#fff;border-radius:12px;padding:14px 8px;text-align:left;color:var(--ink)}.preset button.selected{border:2px solid var(--green);padding:13px 7px;background:#f0f7f1}.preset strong{display:block;font-size:14px}.preset small{display:block;color:var(--sub);margin-top:7px;font-size:11px}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:13px}.dual label{margin-top:22px}.actions{display:flex;gap:12px;align-items:center;margin-top:22px}.primary{background:var(--green);color:#fff;border:0;border-radius:12px;min-height:54px;padding:14px 20px;font-weight:800;font-size:15px;flex:1}.primary:disabled{opacity:.5;cursor:wait}.textbtn{border:1px solid #dce5dd;background:white;border-radius:12px;padding:14px;font-size:13px;font-weight:700;color:var(--green)}
+.right{display:grid;gap:20px}.preview{padding:25px;background:linear-gradient(130deg,#10291e,#1e4c38);color:white;overflow:hidden}.preview h2{font-size:19px;margin:0 0 5px}.preview p{color:#c7d7ca;font-size:12px;margin:0 0 22px}
+.stage{display:flex;justify-content:center}.phone{position:relative;aspect-ratio:9/16;width:min(100%,218px);overflow:hidden;border-radius:19px;background:radial-gradient(circle at 50% 28%,#d5bd85,#7c9e82 37%,#1a4635 76%);border:5px solid #dce5dc;box-shadow:0 20px 34px #0004;display:flex;flex-direction:column;justify-content:space-between;text-align:center;transition:width .2s,aspect-ratio .2s}
+.phone.landscape{aspect-ratio:16/9;width:100%;max-width:400px}.previewtop{font-size:10px;letter-spacing:.12em;margin-top:25px;color:#fff7e5;text-shadow:0 2px 8px #0008}.previewcenter{padding:25px 12px;text-shadow:0 3px 14px #0009}.previewcenter h3{font-size:clamp(20px,2.1vw,28px);margin:0;line-height:1.45;word-break:break-word}.previewcenter span{display:block;margin-top:13px;font-size:12px}.previewbottom{padding:0 12px 28px;font-size:11px;color:#fff9e9}
+.previewmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;border-top:1px solid #ffffff36;padding-top:16px;font-size:12px;color:#d7e4db}
+.note{border:1px solid #e7e4d9;background:#fffdf5;border-radius:16px;padding:18px;color:#6c6250;line-height:1.75;font-size:13px}.note strong{display:block;color:#665335;font-size:14px;margin-bottom:5px}
+.status{display:none;border-radius:13px;background:#f1f8f3;border:1px solid #c8dfcf;padding:16px;margin-top:18px;color:#22563e;font-size:13px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}.status.error{background:#fff5f5;border-color:#f1d0d0;color:#a13d3d}
+.history{margin-top:28px}.history>h2{font-size:19px}.historyList{display:grid;gap:10px}.historyitem{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fff}.historyitem strong{display:block;font-size:14px}.historyitem small{display:block;color:var(--sub);margin-top:6px;font-size:12px}.historyitem em{display:inline-block;margin-top:7px;font-size:11px;font-style:normal;color:#846533}
+footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-size:12px}.muted{color:var(--sub)}
+@media(max-width:900px){.columns{grid-template-columns:1fr}.right{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}.preview{grid-column:1}.note{grid-column:2}.history{grid-column:1/-1}}
+@media(max-width:650px){header{padding:0 18px;height:66px}.brand strong{font-size:15px}.mark{width:40px;height:40px;font-size:20px}.headright a{display:none}main{padding:30px 15px 55px}.panel{padding:20px 18px}.right{grid-template-columns:1fr}.preview,.note,.history{grid-column:1}.preset{gap:7px}.preset button{padding:11px 8px}.preset button.selected{padding:10px 7px}.preset strong{font-size:13px}.dual{grid-template-columns:1fr;gap:0}.dual label{margin-top:18px}.hero p{font-size:14px}.actions{flex-direction:column;align-items:stretch}.primary,.textbtn{width:100%}.phone{width:min(55vw,216px)}}
+</style>
+</head>
+<body>
+<header><a href="./" class="brand"><span class="mark">崇</span><span><strong>崇正 AI 影片工作台</strong><small>CHONGZHENG · CREATIVE STUDIO</small></span></a><div class="headright"><span class="tag">雲端試行版</span><a href="https://staney41011--chongzheng-cloud-video-editor-web.us-east.modal.run/test">基本剪輯測試 ↗</a></div></header>
+<main>
+<section class="hero"><div class="eyebrow">FROM PROMPT TO VIDEO</div><h1>把珍貴的活動時刻，<br>剪成值得回味的故事。</h1><p>貼上 Google Drive 素材資料夾，選擇影片格式，再用中文告訴 AI 你的想法。現在可先保存完整剪輯任務；Google Drive 自動讀取與 AI 製片串接中。</p></section>
+<div class="columns">
+<section class="panel">
+<div class="paneltitle"><span class="num">01</span><h2>建立剪輯任務</h2></div>
+<form id="briefForm">
+<label for="password">工作台密碼</label><input type="password" id="password" required autocomplete="off" placeholder="輸入你設定的 EDITOR_KEY"><p class="hint">只在這個頁面使用，不儲存在瀏覽器或剪輯任務內。</p>
+<label for="project">活動名稱</label><input type="text" id="project" maxlength="100" required value="" placeholder="例如：青年進階班｜活動回顧">
+<label for="drive">Google Drive 素材資料夾</label><input type="text" id="drive" maxlength="500" required spellcheck="false" value="" placeholder="https://drive.google.com/drive/folders/..."><p class="hint">使用 Google Drive 資料夾網址；不必先將素材下載到電腦。</p>
+<label>成品格式</label><div class="preset" id="presets">
+<button type="button" data-format="reels" class="selected" aria-pressed="true"><strong>Reels</strong><small>9:16 · 直式</small></button>
+<button type="button" data-format="shorts" aria-pressed="false"><strong>Shorts</strong><small>9:16 · 直式</small></button>
+<button type="button" data-format="youtube" aria-pressed="false"><strong>YouTube</strong><small>16:9 · 橫式</small></button>
+</div>
+<div class="dual">
+<div><label for="duration">影片長度</label><select id="duration"><option value="30">30 秒</option><option value="60" selected>60 秒</option><option value="90">90 秒</option><option value="180">3 分鐘</option></select></div>
+<div><label for="captions">字幕方式</label><select id="captions"><option value="narrative" selected>活動敘事字幕</option><option value="spoken">依照實際講話逐字字幕</option><option value="both">兩種都要</option><option value="none">不需要字幕</option></select></div>
+</div>
+<div class="dual">
+<div><label for="music">背景音樂</label><select id="music"><option value="warm" selected>溫暖、感動的器樂</option><option value="bright">活潑、明亮的器樂</option><option value="ceremonial">莊重、有力量的器樂</option><option value="none">不要背景音樂</option></select></div>
+<div><label for="ratio">畫面輸出</label><select id="ratio"><option value="1080" selected>1080p 高清</option><option value="720">720p 快速預覽</option></select></div>
+</div>
+<div class="dual"><div><label for="videoType">影片用途</label><select id="videoType"><option value="event">活動回顧／花絮</option><option value="course">課程精華／講座</option><option value="promo">招生／宣傳短片</option><option value="memory">感恩／紀念影片</option></select></div><div><label for="tone">影片風格</label><select id="tone"><option value="warm">溫暖、感動、自然</option><option value="energetic">青春、活潑、有節奏</option><option value="elegant">莊重、典雅、有質感</option><option value="cinematic">電影感、情緒堆疊</option></select></div></div><label for="highlights">活動重點（可留空）</label><input type="text" id="highlights" maxlength="300" placeholder="例如：甜點製作、互動遊戲、團體合照"><p class="hint">如果沒有填重點，指令會要求先分析素材內容，不會虛構活動環節。</p><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:22px"><label for="prompt" style="margin:0">你的剪輯 Prompt</label><button type="button" class="textbtn" id="generateButton" style="background:#edf6f0;border-color:#b4d8c4;padding:10px 14px">✦ 一鍵自動產生 Prompt</button></div><p class="hint" style="margin-bottom:9px">根據活動、影片類型、字幕、音樂與輸出格式自動編寫，可再手動修改。</p><textarea id="prompt" required maxlength="5000" placeholder="點擊「一鍵自動產生 Prompt」，或直接輸入你的剪輯需求"></textarea>
+<div class="actions"><button class="primary" id="saveButton" type="submit">儲存這份剪輯任務　→</button><button class="textbtn" type="button" id="copyButton">複製 Prompt</button></div>
+<div id="status" class="status" role="status"></div>
+</form>
+</section>
+<aside class="right">
+<section class="panel preview">
+<h2>成品畫面預覽</h2><p>示意排版，不是影片實際畫面</p>
+<div class="stage"><div class="phone" id="phone"><div class="previewtop">CHONGZHENG · VIDEO STUDIO</div><div class="previewcenter"><h3 id="previewTitle">活動回顧</h3><span>精彩活動回顧</span></div><div class="previewbottom">留下每個溫暖的瞬間</div></div></div>
+<div class="previewmeta"><span id="previewFormat">REELS · 9:16</span><span id="previewDuration">60 秒</span></div>
+</section>
+<section class="note"><strong>目前的功能狀態</strong>這個網頁可以安全保存剪輯需求與瀏覽任務紀錄。尚未接通 Google Drive 的雲端授權、AI 自動選段與成品回存，因此新任務會標記為「等待後端串接」，不會假裝影片已在製作。<br><br>如果要先測試 Modal 是否能實際輸出 MP4，可使用 <a href="https://staney41011--chongzheng-cloud-video-editor-web.us-east.modal.run/test">基本剪輯測試</a>。</section>
+<section class="panel history"><div class="paneltitle"><span class="num">02</span><h2>我的剪輯任務</h2></div><button class="textbtn" style="width:100%" type="button" id="loadButton">載入已儲存的任務</button><div class="historyList" id="historyList" style="margin-top:14px"><p class="muted" style="font-size:13px">輸入密碼後，點擊載入。</p></div></section>
+</aside>
+</div>
+</main><footer>崇正 AI 影片工作台 · 專案測試版 · 保護活動影像與參與者隱私</footer>
+<script>
+(function(){
+const el=id=>document.getElementById(id);
+const API_BASE='https://staney41011--chongzheng-cloud-video-editor-web.us-east.modal.run';
+let format='reels';
+const formatLabels={reels:'REELS · 9:16',shorts:'SHORTS · 9:16',youtube:'YOUTUBE · 16:9'};
+const defaultName=()=>el('project').value.replace(/^20\d{2}\s*/,'').split('｜')[0].trim()||'活動回顧';
+function refresh(){
+el('previewTitle').textContent=defaultName();
+el('previewFormat').textContent=formatLabels[format];
+el('previewDuration').textContent=el('duration').value==='180'?'3 分鐘':el('duration').value+' 秒';
+el('phone').classList.toggle('landscape',format==='youtube');
+}
+document.querySelectorAll('[data-format]').forEach(btn=>btn.addEventListener('click',()=>{
+format=btn.getAttribute('data-format');
+document.querySelectorAll('[data-format]').forEach(b=>{
+const isOn=b===btn;b.classList.toggle('selected',isOn);b.setAttribute('aria-pressed',isOn?'true':'false');
+});refresh();
+}));
+el('project').addEventListener('input',refresh);el('duration').addEventListener('change',refresh);refresh();
+function show(message,isError){const box=el('status');box.style.display='block';box.className='status'+(isError?' error':'');box.textContent=message;}
+async function responseJSON(response){let value={};try{value=await response.json()}catch(e){}if(!response.ok)throw new Error(value.detail||'伺服器回應失敗');return value;}
+const secret=()=>el('password').value.trim();
+
+const promptStyle={warm:'溫馨、感動、真實且不煽情',energetic:'年輕、明亮、活潑、有節奏',elegant:'典雅、莊重、乾淨克制',cinematic:'電影敘事、漸進堆疊情緒'};
+const promptMusic={warm:'溫柔、有層次的原創器樂',bright:'明亮輕快的原創器樂',ceremonial:'莊重且有力量的原創器樂',none:'不加入背景音樂'};
+const promptCaptions={narrative:'清楚易讀的繁體中文活動敘事字幕，僅敘述可由素材確認的畫面',spoken:'使用實際錄音製作逐字字幕，不可虛構發言',both:'真實對白逐字字幕加上適量敘事文字，避免疊字',none:'不加入字幕'};
+const promptType={event:'活動回顧',course:'課程精華',promo:'招生宣傳',memory:'感恩紀念'};
+const promptFocus={
+event:'呈現活動開始、參與互動、過程亮點和真誠的結尾，交錯使用照片與影片。',
+course:'保留講師原意與完整論述脈絡，挑選能獨立理解的精華，不改變原話。',
+promo:'前三秒建立吸引力，凸顯真實的參與價值，不得添加未證實的招生活動資訊。',
+memory:'捕捉真實互動與珍貴時刻，營造溫暖的回憶，不虛構致謝內容。'
+};
+function createPrompt(){
+const type=el('videoType').value;
+const name=el('project').value.trim()||'本次活動';
+const duration=el('duration').value;
+const target=format==='youtube'?'YouTube 16:9 橫式':format==='shorts'?'YouTube Shorts 9:16 直式':'Instagram Reels 9:16 直式';
+const quality=el('ratio').value==='1080'?'1080p':'720p';
+const highlights=el('highlights').value.trim();
+const parts=[
+'請將「'+name+'」製作成一支'+promptType[type]+'影片。',
+'素材來源：'+(el('drive').value.trim()||'本任務提供的 Google Drive 資料夾')+'。',
+'輸出規格：'+target+'，'+quality+'，片長約 '+duration+' 秒；素材不足時不重複灌水。',
+'影片風格：'+promptStyle[el('tone').value]+'。'+promptFocus[type],
+highlights?'優先呈現以下重點：'+highlights+'。若素材中沒有這些內容，請勿捏造。':'先辨識照片與影片的實際場景，再挑選有代表性、清晰、有情緒張力的畫面；不可憑空假設活動發生什麼事。',
+'剪輯節奏：保留人物臉部及重要主體，直式構圖不可裁掉關鍵人物，過度模糊、晃動、重複和無關片段應適度去除；轉場自然、不過量。',
+'字幕：'+promptCaptions[el('captions').value]+'；字幕要大且避開手機介面遮擋區。',
+'音樂：'+promptMusic[el('music').value]+'；只使用有合法授權的音樂，重要人聲出現時自動降低背景音量。',
+'輸出 H.264 MP4 / AAC；保留素材清單、時間碼與剪輯設定，輸出前檢查黑畫面、字幕、音畫同步及是否有錯誤內容。',
+'所有內容必須尊重參與者與講師，不得改寫講師原話、添加虛構對白或未核實的人名。'
+];
+return parts.join('\n\n');
+}
+el('generateButton').addEventListener('click',()=>{
+el('prompt').value=createPrompt();
+show('已依你選擇的條件產生剪輯 Prompt，仍可手動調整。這是免費規則式自動生成，尚未實際讀取 Google Drive 影像分析。',false);
+el('prompt').focus();
+});
+
+el('briefForm').addEventListener('submit',async(event)=>{
+event.preventDefault();if(!secret()){show('請先輸入工作台密碼。',true);return}
+const payload={
+project:el('project').value.trim(),folder_url:el('drive').value.trim(),format:format,
+duration_seconds:Number(el('duration').value),captions:el('captions').value,
+music:el('music').value,quality:el('ratio').value,prompt:el('prompt').value.trim()
+};
+const button=el('saveButton');button.disabled=true;button.textContent='正在儲存…';
+try{
+const response=await fetch(API_BASE+'/api/briefs',{method:'POST',headers:{'Content-Type':'application/json','X-Editor-Key':secret()},body:JSON.stringify(payload)});
+const value=await responseJSON(response);
+show('已儲存任務 '+value.id+'。\n狀態：等待 Google Drive / AI 剪輯後端串接。\n目前尚未開始剪片，也不會產生運算費用。',false);
+loadHistory();
+}catch(err){show('儲存失敗：'+err.message,true)}
+finally{button.disabled=false;button.textContent='儲存這份剪輯任務　→'}
+});
+el('copyButton').addEventListener('click',async()=>{
+const prompt=el('prompt').value;try{await navigator.clipboard.writeText(prompt);show('已複製 Prompt。',false)}catch(err){show('複製失敗，請手動選取文字。',true)}
+});
+async function loadHistory(){
+const list=el('historyList');list.textContent='正在載入…';
+try{
+const response=await fetch(API_BASE+'/api/briefs',{headers:{'X-Editor-Key':secret()}});
+const data=await responseJSON(response);list.replaceChildren();
+if(!data.items.length){const p=document.createElement('p');p.className='muted';p.textContent='目前尚無儲存的任務。';list.append(p);return}
+for(const job of data.items){
+const item=document.createElement('div');item.className='historyitem';
+const title=document.createElement('strong');title.textContent=job.project;
+const sub=document.createElement('small');sub.textContent=(formatLabels[job.format]||job.format)+' · '+job.duration_seconds+' 秒 · '+(job.created_at||'');
+const status=document.createElement('em');status.textContent='等待後端串接';
+item.append(title,sub,status);list.append(item);
+}
+}catch(err){list.textContent='無法載入：'+err.message}
+}
+el('loadButton').addEventListener('click',loadHistory);
+})();
+</script>
+</body></html>
