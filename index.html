@@ -23,7 +23,7 @@ label{display:block;font-weight:700;font-size:14px;margin:22px 0 9px}.hint{font-
 .previewmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;border-top:1px solid #ffffff36;padding-top:16px;font-size:12px;color:#d7e4db}
 .note{border:1px solid #e7e4d9;background:#fffdf5;border-radius:16px;padding:18px;color:#6c6250;line-height:1.75;font-size:13px}.note strong{display:block;color:#665335;font-size:14px;margin-bottom:5px}
 .status{display:none;border-radius:13px;background:#f1f8f3;border:1px solid #c8dfcf;padding:16px;margin-top:18px;color:#22563e;font-size:13px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}.status.error{background:#fff5f5;border-color:#f1d0d0;color:#a13d3d}
-.history{margin-top:28px}.history>h2{font-size:19px}.historyList{display:grid;gap:10px}.historyitem{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fff}.historyitem strong{display:block;font-size:14px}.historyitem small{display:block;color:var(--sub);margin-top:6px;font-size:12px}.historyitem em{display:inline-block;margin-top:7px;font-size:11px;font-style:normal;color:#846533}
+.history{margin-top:28px}.history>h2{font-size:19px}.historyList{display:grid;gap:10px}.historyitem{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fff}.historyitem strong{display:block;font-size:14px}.historyitem small{display:block;color:var(--sub);margin-top:6px;font-size:12px}.historyitem em{display:inline-block;margin-top:7px;font-size:11px;font-style:normal;color:#846533}.historycontrols{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.historycontrols button{flex:1;min-width:96px;min-height:42px;padding:9px 11px;font-size:12px}.historycontrols .danger{color:#ae4646;border-color:#f0d0d0;background:#fff8f8}.historycontrols button:disabled{opacity:.45;cursor:not-allowed}
 footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-size:12px}.muted{color:var(--sub)}
 @media(max-width:900px){.columns{grid-template-columns:1fr}.right{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}.preview{grid-column:1}.note{grid-column:2}.history{grid-column:1/-1}}
 @media(max-width:650px){header{padding:0 18px;height:66px}.brand strong{font-size:15px}.mark{width:40px;height:40px;font-size:20px}.headright a{display:none}main{padding:30px 15px 55px}.panel{padding:20px 18px}.right{grid-template-columns:1fr}.preview,.note,.history{grid-column:1}.preset{gap:7px}.preset button{padding:11px 8px}.preset button.selected{padding:10px 7px}.preset strong{font-size:13px}.dual{grid-template-columns:1fr;gap:0}.dual label{margin-top:18px}.hero p{font-size:14px}.actions{flex-direction:column;align-items:stretch}.primary,.textbtn{width:100%}.phone{width:min(55vw,216px)}}
@@ -139,7 +139,19 @@ loadContactSheets(id);
 }
 if(j.status==='completed'&&j.output){
 clearInterval(poll);show('影片已完成：'+j.output.name+'\n已存回 Google Drive。'+(j.output.music_source==='user_drive'?'\n配樂：採用你放在雲端的音樂':j.output.music_source==='original_score'?'\n配樂：原創器樂已加入':'\n配樂：未使用'),false);
-const link=document.createElement('a');link.href=j.output.url;link.target='_blank';link.rel='noopener';link.textContent='開啟影片成品';el('status').append(document.createElement('br'),link);
+const link=document.createElement('a');link.href=j.output.url;link.target='_blank';link.rel='noopener';link.textContent='開啟最新版影片';el('status').append(document.createElement('br'),link);
+}
+if(j.output&&j.status!=='completed'){
+const link=document.createElement('a');link.href=j.output.url;link.target='_blank';link.rel='noopener';link.textContent='查看上一版成品（仍保留）';el('status').append(document.createElement('br'),link);
+}
+if(j.status==='completed'&&Array.isArray(j.outputs_history)&&j.outputs_history.length){
+const line=document.createElement('div');line.style.marginTop='10px';line.textContent='以前的版本：';
+j.outputs_history.forEach((out,i)=>{
+if(!out.url)return;
+const link=document.createElement('a');link.href=out.url;link.target='_blank';link.rel='noopener';
+link.textContent='第 '+(i+1)+' 版';link.style.marginRight='12px';line.append(link);
+});
+el('status').append(line);
 }
 if(j.status==='failed')clearInterval(poll);
 return j;
@@ -154,7 +166,7 @@ const image=document.createElement('img');image.src=src;image.alt='實際素材�
 }
 }
 function monitor(id){clearInterval(poll);poll=setInterval(async()=>{
-try{const j=await showJob(id);if(['completed','review','failed'].includes(j.status))clearInterval(poll)}
+try{const j=await showJob(id);if(['completed','review','failed'].includes(j.status)){clearInterval(poll);loadHistory()}}
 catch(e){clearInterval(poll);show(e.message,true)}
 },6000)}
 el('renderButton').addEventListener('click',async()=>{
@@ -191,6 +203,28 @@ finally{btn.disabled=false;btn.textContent='儲存並讓 AI 分析素材　→'}
 el('copyButton').addEventListener('click',async()=>{
 const prompt=el('prompt').value;try{await navigator.clipboard.writeText(prompt);show('已複製 Prompt。',false)}catch(err){show('複製失敗，請手動選取文字。',true)}
 });
+async function rerenderExisting(job){
+if(!job.can_rerender){show('這份任務沒有可用的 AI 分鏡，請先分析素材。',true);return}
+if(!window.confirm('要重新出片「'+job.project+'」嗎？\n\n將沿用原本已挑選的素材和分鏡，改用最新剪輯程式重新輸出。新成品會另存到 Google Drive，舊版不會刪除。'))return;
+const id=job.id;
+try{
+const result=await responseJSON(await API('/api/briefs/'+id+'/rerender',{method:'POST'}));
+workingId=id;el('aiResults').style.display='none';
+show('已開始重新出片（第 '+result.version+' 版）！\n沿用既有 AI 分鏡，不必重新分析；完成後新舊成品都會保留在 Google Drive。',false);
+monitor(id);loadHistory();
+el('status').scrollIntoView({behavior:'smooth',block:'center'});
+}catch(e){show('重新出片失敗：'+e.message,true);loadHistory()}
+}
+async function deleteExisting(job){
+if(['queued','analyzing','rendering'].includes(job.status)){show('這份任務正在執行，完成後才可以刪除。',true);return}
+if(!window.confirm('確定刪除「'+job.project+'」這份工作台任務嗎？\n\n這會移除任務紀錄與暫存檔，無法復原；Google Drive 原始照片、影片與已輸出成品都會保留。'))return;
+try{
+await responseJSON(await API('/api/briefs/'+job.id,{method:'DELETE'}));
+if(workingId===job.id){clearInterval(poll);workingId=null;previousPrompt='';el('aiResults').style.display='none'}
+show('任務已刪除。\nGoogle Drive 裡的原始素材與已完成影片都已保留。',false);
+loadHistory();
+}catch(e){show('無法刪除任務：'+e.message,true);loadHistory()}
+}
 async function loadHistory(){
 const list=el('historyList');list.textContent='正在載入…';
 try{
@@ -202,9 +236,19 @@ const item=document.createElement('div');item.className='historyitem';
 const title=document.createElement('strong');title.textContent=job.project;
 const sub=document.createElement('small');sub.textContent=(formatLabels[job.format]||job.format)+' · '+job.duration_seconds+' 秒 · '+(job.created_at||'');
 const status=document.createElement('em');status.textContent=statusNames[job.status]||job.status;
-const open=document.createElement('button');open.className='textbtn';open.style.cssText='display:block;margin-top:8px;padding:7px 11px';open.type='button';open.textContent='開啟任務';
+const controls=document.createElement('div');controls.className='historycontrols';
+const open=document.createElement('button');open.className='textbtn';open.type='button';open.textContent='開啟任務';
 open.addEventListener('click',async()=>{try{const j=await showJob(job.id);if(['queued','analyzing','rendering'].includes(j.status))monitor(job.id);el('status').scrollIntoView({behavior:'smooth',block:'center'})}catch(err){show('無法開啟任務：'+err.message,true)}});
-item.append(title,sub,status,open);list.append(item);
+controls.append(open);
+if(job.can_rerender){
+const again=document.createElement('button');again.className='textbtn';again.type='button';again.textContent='重新出片';
+again.addEventListener('click',()=>rerenderExisting(job));controls.append(again);
+}
+const del=document.createElement('button');del.className='textbtn danger';del.type='button';del.textContent='刪除任務';
+const busy=['queued','analyzing','rendering'].includes(job.status);
+del.disabled=busy;del.title=busy?'任務執行中，完成後才能刪除':'只刪除工作台紀錄，不刪除 Google Drive 素材';
+del.addEventListener('click',()=>deleteExisting(job));controls.append(del);
+item.append(title,sub,status,controls);list.append(item);
 }
 }catch(err){list.textContent='無法載入：'+err.message}
 }
