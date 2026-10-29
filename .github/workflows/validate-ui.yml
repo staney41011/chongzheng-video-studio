@@ -1,0 +1,44 @@
+name: Validate Studio Mobile Web UI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - ".github/workflows/validate-ui.yml"
+  workflow_dispatch:
+
+jobs:
+  check-javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract inline JavaScript and check syntax
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          class ScriptParser(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=False)
+                  self.inside = False
+                  self.parts = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == "script" and not dict(attrs).get("src"):
+                      self.inside = True
+              def handle_endtag(self, tag):
+                  if tag == "script":
+                      self.inside = False
+              def handle_data(self, data):
+                  if self.inside:
+                      self.parts.append(data)
+          p = ScriptParser()
+          p.feed(Path("index.html").read_text(encoding="utf-8"))
+          assert p.parts, "No inline JavaScript found"
+          Path("/tmp/chongzheng_ui.js").write_text("\n".join(p.parts), encoding="utf-8")
+          PY
+          node --check /tmp/chongzheng_ui.js
+      - name: Verify task management is visible
+        run: |
+          grep -q '重新出片' index.html
+          grep -q '刪除任務' index.html
