@@ -209,10 +209,10 @@ const prompt=el('prompt').value;try{await navigator.clipboard.writeText(prompt);
 });
 async function rerenderExisting(job){
 if(!job.can_rerender){show('這份任務沒有可用的 AI 分鏡，請先分析素材。',true);return}
-if(!window.confirm('要重新出片「'+job.project+'」嗎？\n\n將沿用原本已挑選的素材和分鏡，改用最新剪輯程式重新輸出。新成品會另存到 Google Drive，舊版不會刪除。'))return;
+if(!window.confirm('要重新出片「'+job.project+'」嗎？\n\n將沿用原本的素材與分鏡，採用目前選擇的幀率與特效重新出片。新成品會另存到 Google Drive，舊版不會刪除。'))return;
 const id=job.id;
 try{
-const result=await responseJSON(await API('/api/briefs/'+id+'/rerender',{method:'POST'}));
+const result=await responseJSON(await API('/api/briefs/'+id+'/rerender',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fps:Number(el('fps').value),effects:el('effects').value})}));
 workingId=id;el('aiResults').style.display='none';
 show('已開始重新出片（第 '+result.version+' 版）！\n沿用既有 AI 分鏡，不必重新分析；完成後新舊成品都會保留在 Google Drive。',false);
 monitor(id);loadHistory();
