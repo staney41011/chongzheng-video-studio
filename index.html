@@ -50,7 +50,7 @@ footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-si
 <div><label for="captions">字幕方式</label><select id="captions"><option value="narrative" selected>活動敘事字幕</option><option value="spoken">依照實際講話逐字字幕</option><option value="both">兩種都要</option><option value="none">不需要字幕</option></select></div>
 </div>
 <div class="dual">
-<div><label for="music">背景音樂</label><select id="music"><option value="warm" selected>溫暖、感動的器樂</option><option value="bright">活潑、明亮的器樂</option><option value="ceremonial">莊重、有力量的器樂</option><option value="none">不要背景音樂</option></select></div>
+<div><label for="music">背景音樂</label><select id="music"><option value="warm" selected>溫暖、感動的器樂</option><option value="bright">活潑、明亮的器樂</option><option value="ceremonial">莊重、有力量的器樂</option><option value="none">不要背景音樂</option></select><p class="hint">可以在素材雲端資料夾放入有使用權的「配樂.mp3」或「BGM.mp3」，工作台會優先使用；沒有的話改用系統原創器樂。</p></div>
 <div><label for="ratio">畫面輸出</label><select id="ratio"><option value="1080" selected>1080p 高清</option><option value="720">720p 快速預覽</option></select></div>
 </div>
 <div class="dual"><div><label for="videoType">影片用途</label><select id="videoType"><option value="event">活動回顧／花絮</option><option value="course">課程精華／講座</option><option value="promo">招生／宣傳短片</option><option value="memory">感恩／紀念影片</option></select></div><div><label for="tone">影片風格</label><select id="tone"><option value="warm">溫暖、感動、自然</option><option value="energetic">青春、活潑、有節奏</option><option value="elegant">莊重、典雅、有質感</option><option value="cinematic">電影感、情緒堆疊</option></select></div></div><label for="highlights">活動重點（可留空）</label><input type="text" id="highlights" maxlength="300" placeholder="例如：甜點製作、互動遊戲、團體合照"><p class="hint">如果沒有填重點，指令會要求先分析素材內容，不會虛構活動環節。</p><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:22px"><label for="prompt" style="margin:0">你的剪輯 Prompt</label><button type="button" class="textbtn" id="generateButton" style="background:#edf6f0;border-color:#b4d8c4;padding:10px 14px">✦ AI 看過素材後產生 Prompt</button></div><p class="hint" style="margin-bottom:9px">產生的 Prompt 必須依據 AI 實際檢視的照片及影片畫面，不會只是填空範本。</p><textarea id="prompt" maxlength="5000" placeholder="這裡可先輸入你希望影片呈現的方向；AI 檢視素材後將提出實際剪輯 Prompt。"></textarea>
@@ -138,7 +138,7 @@ el('prompt').value=j.prompt||j.analysis.prompt||'';previousPrompt=el('prompt').v
 loadContactSheets(id);
 }
 if(j.status==='completed'&&j.output){
-clearInterval(poll);show('影片已完成：'+j.output.name+'\n已存回 Google Drive。',false);
+clearInterval(poll);show('影片已完成：'+j.output.name+'\n已存回 Google Drive。'+(j.output.music_source==='user_drive'?'\n配樂：採用你放在雲端的音樂':j.output.music_source==='original_score'?'\n配樂：原創器樂已加入':'\n配樂：未使用'),false);
 const link=document.createElement('a');link.href=j.output.url;link.target='_blank';link.rel='noopener';link.textContent='開啟影片成品';el('status').append(document.createElement('br'),link);
 }
 if(j.status==='failed')clearInterval(poll);
