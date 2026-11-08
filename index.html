@@ -57,6 +57,18 @@ footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-si
 <div><label for="fps">影片流暢度</label><select id="fps"><option value="60" selected>60 FPS · 高流暢（推薦）</option><option value="30">30 FPS · 節省雲端運算</option></select><p class="hint">照片會以 60fps 產生不同的運鏡畫面；原始影片若只有 30fps，不能保證變成真正 60fps 拍攝的動態。</p></div>
 <div><label for="effects">精緻特效</label><select id="effects"><option value="cinematic" selected>電影質感 · 柔和光影＋動態轉場</option><option value="dynamic">活力節奏 · 推拉與滑動轉場</option><option value="clean">極簡自然 · 少特效</option></select><p class="hint">保留真實人物和活動場景，不使用會扭曲人臉的生成特效。</p></div>
 </div>
+<section style="border:1px solid #dbe4dc;border-radius:15px;padding:16px 15px;margin-top:24px;background:#f8faf8">
+<div class="paneltitle" style="margin-bottom:10px"><span class="num">✦</span><h2>Pixelle 創作工具</h2></div>
+<p class="hint">依照 Pixelle-Video 的分鏡、版型與聲音設計概念整合。使用既有真實素材，不會自動呼叫付費 AI 生圖。</p>
+<div class="dual">
+<div><label for="template">影片視覺模板</label><select id="template"><option value="none">原始畫面（不加片頭版型）</option><option value="warm_documentary" selected>溫馨紀錄 · 柔和品牌片頭</option><option value="heritage">典雅傳承 · 金色紀念片頭</option><option value="youthful">青春活力 · 明亮動態片頭</option></select></div>
+<div><label for="narrationMode">繁體中文 AI 旁白</label><select id="narrationMode"><option value="none" selected>不使用旁白</option><option value="auto">依已審核分鏡字幕自動配音</option><option value="custom">自訂旁白文字</option></select><p class="hint">使用線上 Edge Neural 語音；無需另付模型 API 費用，但需要服務可用。</p></div>
+</div>
+<div id="voiceOptions" style="display:none">
+<div class="dual"><div><label for="voice">旁白音色</label><select id="voice"><option value="female">臺灣女聲</option><option value="male">臺灣男聲</option></select></div><div><p class="hint" style="margin-top:22px">現場原音與配樂會在旁白出現時自動降低音量；過長旁白會提示修改，避免被剪掉。</p></div></div>
+<div id="voiceCustom" style="display:none"><label for="voiceScript">旁白文稿（最多 600 字）</label><textarea id="voiceScript" rows="4" maxlength="600" placeholder="請以實際發生的活動內容撰寫。不要填入未經證實的講師引言或發言。"></textarea></div>
+</div>
+</section>
 <label for="highlights">活動重點（可留空）</label><input type="text" id="highlights" maxlength="300" placeholder="例如：甜點製作、互動遊戲、團體合照"><p class="hint">如果沒有填重點，指令會要求先分析素材內容，不會虛構活動環節。</p><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:22px"><label for="prompt" style="margin:0">你的剪輯 Prompt</label><button type="button" class="textbtn" id="generateButton" style="background:#edf6f0;border-color:#b4d8c4;padding:10px 14px">✦ AI 看過素材後產生 Prompt</button></div><p class="hint" style="margin-bottom:9px">產生的 Prompt 必須依據 AI 實際檢視的照片及影片畫面，不會只是填空範本。</p><textarea id="prompt" maxlength="5000" placeholder="這裡可先輸入你希望影片呈現的方向；AI 檢視素材後將提出實際剪輯 Prompt。"></textarea>
 <label style="display:flex;align-items:flex-start;gap:10px;font-weight:400;font-size:12px;color:#5b6c62;line-height:1.6;margin-top:20px"><input type="checkbox" required style="margin-top:4px;flex-shrink:0"><span>我已確認可將這次活動的照片與影片抽樣畫面提供給 Google Gemini 進行 AI 分析，且擁有處理這批素材的權限。原始影片由 Modal 雲端處理。</span></label>
 <div class="actions"><button class="primary" id="saveButton" type="submit">儲存並讓 AI 分析素材　→</button><button class="textbtn" type="button" id="copyButton">複製 Prompt</button></div>
@@ -86,6 +98,9 @@ el('togglePin').addEventListener('click',()=>{
   button.setAttribute('aria-label',showing?'隱藏密碼':'顯示密碼');
 });
 const API_BASE='https://staney41011--chongzheng-cloud-video-editor-web.us-east.modal.run';
+const studioOptions=()=>({template:el('template').value,narration_mode:el('narrationMode').value,voice:el('voice').value,narration_text:el('voiceScript').value.trim()});
+const refreshVoice=()=>{el('voiceOptions').style.display=el('narrationMode').value==='none'?'none':'block';el('voiceCustom').style.display=el('narrationMode').value==='custom'?'block':'none'};
+el('narrationMode').addEventListener('change',refreshVoice);refreshVoice();
 let format='reels';
 const formatLabels={reels:'REELS · 9:16',shorts:'SHORTS · 9:16',youtube:'YOUTUBE · 16:9'};
 const defaultName=()=>el('project').value.replace(/^20\d{2}\s*/,'').split('｜')[0].trim()||'活動回顧';
@@ -182,7 +197,7 @@ await responseJSON(await API('/api/briefs/'+workingId+'/prompt',{method:'PUT',he
 await responseJSON(await API('/api/briefs/'+workingId+'/analyze',{method:'POST'}));
 el('aiResults').style.display='none';show('你修改了 Prompt，AI 正重新分析素材並調整時間軸，完成後再確認渲染。',false);monitor(workingId);
 }else{
-await responseJSON(await API('/api/briefs/'+workingId+'/render',{method:'POST'}));
+await responseJSON(await API('/api/briefs/'+workingId+'/render',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(studioOptions())}));
 el('aiResults').style.display='none';show('已送出雲端 MP4 渲染，關閉手機也不會中斷後端任務。',false);monitor(workingId);
 }
 }catch(e){show('無法送出：'+e.message,true)}finally{btn.disabled=false}
@@ -191,7 +206,7 @@ el('briefForm').addEventListener('submit',async e=>{
 e.preventDefault();if(!token()){show('請先輸入工作台密碼。',true);return}
 const payload={project:el('project').value.trim(),folder_url:el('drive').value.trim(),format,
 duration_seconds:Number(el('duration').value),captions:el('captions').value,
-music:el('music').value,quality:el('ratio').value,fps:Number(el('fps').value),effects:el('effects').value,prompt:el('prompt').value.trim(),video_type:el('videoType').value,tone:el('tone').value,highlights:el('highlights').value.trim()};
+music:el('music').value,quality:el('ratio').value,fps:Number(el('fps').value),effects:el('effects').value,...studioOptions(),prompt:el('prompt').value.trim(),video_type:el('videoType').value,tone:el('tone').value,highlights:el('highlights').value.trim()};
 const btn=el('saveButton');btn.disabled=true;btn.textContent='正在建立雲端任務…';
 try{
 const job=await responseJSON(await API('/api/briefs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}));
@@ -209,10 +224,10 @@ const prompt=el('prompt').value;try{await navigator.clipboard.writeText(prompt);
 });
 async function rerenderExisting(job){
 if(!job.can_rerender){show('這份任務沒有可用的 AI 分鏡，請先分析素材。',true);return}
-if(!window.confirm('要重新出片「'+job.project+'」嗎？\n\n將沿用原本的素材與分鏡，採用目前選擇的幀率與特效重新出片。新成品會另存到 Google Drive，舊版不會刪除。'))return;
+if(!window.confirm('要重新出片「'+job.project+'」嗎？\n\n將沿用原本的素材與分鏡，並採用目前畫面設定的幀率、特效、視覺模板及旁白重新出片。新成品會另存到 Google Drive，舊版不會刪除。'))return;
 const id=job.id;
 try{
-const result=await responseJSON(await API('/api/briefs/'+id+'/rerender',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fps:Number(el('fps').value),effects:el('effects').value})}));
+const result=await responseJSON(await API('/api/briefs/'+id+'/rerender',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fps:Number(el('fps').value),effects:el('effects').value,...studioOptions()})}));
 workingId=id;el('aiResults').style.display='none';
 show('已開始重新出片（第 '+result.version+' 版）！\n沿用既有 AI 分鏡，不必重新分析；完成後新舊成品都會保留在 Google Drive。',false);
 monitor(id);loadHistory();
