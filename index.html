@@ -101,6 +101,13 @@ const API_BASE='https://staney41011--chongzheng-cloud-video-editor-web.us-east.m
 const studioOptions=()=>({template:el('template').value,narration_mode:el('narrationMode').value,voice:el('voice').value,narration_text:el('voiceScript').value.trim()});
 const refreshVoice=()=>{el('voiceOptions').style.display=el('narrationMode').value==='none'?'none':'block';el('voiceCustom').style.display=el('narrationMode').value==='custom'?'block':'none'};
 el('narrationMode').addEventListener('change',refreshVoice);refreshVoice();
+const applyJobOptions=j=>{
+  [['fps','fps'],['effects','effects'],['template','template'],['narrationMode','narration_mode'],['voice','voice']].forEach(([id,key])=>{
+    const v=j[key];if(v!==undefined&&Array.from(el(id).options).some(o=>o.value===String(v)))el(id).value=String(v)
+  });
+  if(j.narration_text!==undefined)el('voiceScript').value=j.narration_text||'';
+  refreshVoice();
+};
 let format='reels';
 const formatLabels={reels:'REELS · 9:16',shorts:'SHORTS · 9:16',youtube:'YOUTUBE · 16:9'};
 const defaultName=()=>el('project').value.replace(/^20\d{2}\s*/,'').split('｜')[0].trim()||'活動回顧';
@@ -157,7 +164,7 @@ el('prompt').value=j.prompt||j.analysis.prompt||'';previousPrompt=el('prompt').v
 loadContactSheets(id);
 }
 if(j.status==='completed'&&j.output){
-clearInterval(poll);show('影片已完成：'+j.output.name+'\n已存回 Google Drive。'+(j.output.music_source==='user_drive'?'\n配樂：採用你放在雲端的音樂':j.output.music_source==='original_score'?'\n配樂：原創器樂已加入':'\n配樂：未使用'),false);
+clearInterval(poll);show('影片已完成：'+j.output.name+'\n已存回 Google Drive。'+(j.output.music_source==='user_drive'?'\n配樂：採用你放在雲端的音樂':j.output.music_source==='original_score'?'\n配樂：原創器樂已加入':'\n配樂：未使用')+(j.output.template&&j.output.template!=='none'?'\nPixelle 片頭：已套用':'')+(j.output.narration_mode&&j.output.narration_mode!=='none'?'\n旁白：'+j.output.narration_seconds+' 秒臺灣中文語音':'') ,false);
 const link=document.createElement('a');link.href=j.output.url;link.target='_blank';link.rel='noopener';link.textContent='開啟最新版影片';el('status').append(document.createElement('br'),link);
 }
 if(j.output&&j.status!=='completed'){
@@ -257,7 +264,7 @@ const sub=document.createElement('small');sub.textContent=(formatLabels[job.form
 const status=document.createElement('em');status.textContent=statusNames[job.status]||job.status;
 const controls=document.createElement('div');controls.className='historycontrols';
 const open=document.createElement('button');open.className='textbtn';open.type='button';open.textContent='開啟任務';
-open.addEventListener('click',async()=>{try{const j=await showJob(job.id);if(['queued','analyzing','rendering'].includes(j.status))monitor(job.id);el('status').scrollIntoView({behavior:'smooth',block:'center'})}catch(err){show('無法開啟任務：'+err.message,true)}});
+open.addEventListener('click',async()=>{try{const j=await showJob(job.id);applyJobOptions(j);if(['queued','analyzing','rendering'].includes(j.status))monitor(job.id);el('status').scrollIntoView({behavior:'smooth',block:'center'})}catch(err){show('無法開啟任務：'+err.message,true)}});
 controls.append(open);
 if(job.can_rerender){
 const again=document.createElement('button');again.className='textbtn';again.type='button';again.textContent='重新出片';
