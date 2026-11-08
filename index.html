@@ -62,7 +62,7 @@ footer{max-width:1170px;margin:auto;padding:22px 24px 38px;color:#809087;font-si
 <p class="hint">依照 Pixelle-Video 的分鏡、版型與聲音設計概念整合。使用既有真實素材，不會自動呼叫付費 AI 生圖。</p>
 <div class="dual">
 <div><label for="template">影片視覺模板</label><select id="template"><option value="none">原始畫面（不加片頭版型）</option><option value="warm_documentary" selected>溫馨紀錄 · 柔和品牌片頭</option><option value="heritage">典雅傳承 · 金色紀念片頭</option><option value="youthful">青春活力 · 明亮動態片頭</option></select></div>
-<div><label for="narrationMode">繁體中文 AI 旁白</label><select id="narrationMode"><option value="none" selected>不使用旁白</option><option value="auto">依已審核分鏡字幕自動配音</option><option value="custom">自訂旁白文字</option></select><p class="hint">使用線上 Edge Neural 語音；無需另付模型 API 費用，但需要服務可用。</p></div>
+<div><label for="narrationMode">繁體中文 AI 旁白</label><select id="narrationMode"><option value="none" selected>不使用旁白</option><option value="auto">依已審核分鏡字幕自動配音</option><option value="custom">自訂旁白文字</option></select><p class="hint">啟用旁白時，文稿會傳送給 Microsoft Edge 線上語音服務；無須額外付費模型 API，但服務可能暫時無法使用。</p></div>
 </div>
 <div id="voiceOptions" style="display:none">
 <div class="dual"><div><label for="voice">旁白音色</label><select id="voice"><option value="female">臺灣女聲</option><option value="male">臺灣男聲</option></select></div><div><p class="hint" style="margin-top:22px">現場原音與配樂會在旁白出現時自動降低音量；過長旁白會提示修改，避免被剪掉。</p></div></div>
